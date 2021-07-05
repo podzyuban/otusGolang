@@ -15,7 +15,6 @@ func Unpack(value string) (string, error) {
 	var repeatSymbol string
 
 	for _, valueItem := range value {
-
 		currentSymbol := string(valueItem)
 
 		if unicode.IsDigit(valueItem) {
