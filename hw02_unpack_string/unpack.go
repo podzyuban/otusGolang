@@ -18,7 +18,6 @@ func Unpack(value string) (string, error) {
 		currentSymbol := string(valueItem)
 
 		if unicode.IsDigit(valueItem) {
-
 			if len(repeatSymbol) == 0 {
 				errorResult = ErrInvalidString
 				break
@@ -40,7 +39,7 @@ func Unpack(value string) (string, error) {
 		}
 
 		if repeatSymbol == `\` {
-			repeatSymbol = repeatSymbol + currentSymbol
+			repeatSymbol += currentSymbol
 		} else {
 			tryAppend(repeatSymbol, 1, &resultBuilder)
 			repeatSymbol = currentSymbol
