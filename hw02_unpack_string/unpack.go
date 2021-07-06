@@ -54,15 +54,15 @@ func Unpack(value string) (string, error) {
 }
 
 func tryAppend(value string, count int, resultBuilder *strings.Builder) {
-	if count == 0 || count == -1 {
+	if count == 0 {
 		return
 	}
-	escapedValue := processExcaped(value)
+	escapedValue := processEscaped(value)
 	appendedValue := strings.Repeat(escapedValue, count)
 	resultBuilder.WriteString(appendedValue)
 }
 
-func processExcaped(value string) string {
+func processEscaped(value string) string {
 	if len(value) == 0 {
 		return value
 	}
