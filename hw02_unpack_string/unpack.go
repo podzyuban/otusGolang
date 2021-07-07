@@ -10,12 +10,12 @@ import (
 var (
 	ErrInvalidString = errors.New("invalid string")
 
-	ErrInvalidParseDigit = errors.New("invalid parse digit")
+	errInvalidParseDigit = errors.New("invalid parse digit")
 	escapeSymbol         = `\`
 )
 
 func Unpack(value string) (string, error) {
-	var errorResult error = nil
+	var errorResult error
 	var resultBuilder strings.Builder
 	var repeatSymbol string
 
@@ -80,7 +80,7 @@ func processDigit(currentSymbol string, repeatSymbol string, resultBuilder *stri
 
 func tryAppend(value string, count int, resultBuilder *strings.Builder) error {
 	if count < 0 {
-		return ErrInvalidParseDigit
+		return errInvalidParseDigit
 	}
 	if count == 0 {
 		return nil
