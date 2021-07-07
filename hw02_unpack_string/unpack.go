@@ -58,6 +58,7 @@ func processSymbol(currentSymbol string, repeatSymbol string, resultBuilder *str
 
 func processDigit(currentSymbol string, repeatSymbol string, resultBuilder *strings.Builder) (string, error) {
 	var errorResult error
+	var repeat int
 
 	if len(repeatSymbol) == 0 {
 		return "", ErrInvalidString
@@ -66,7 +67,7 @@ func processDigit(currentSymbol string, repeatSymbol string, resultBuilder *stri
 	if repeatSymbol == escapeSymbol {
 		repeatSymbol = currentSymbol
 	} else {
-		repeat, errorResult := strconv.Atoi(currentSymbol)
+		repeat, errorResult = strconv.Atoi(currentSymbol)
 
 		if errorResult == nil {
 			errorResult = tryAppend(repeatSymbol, repeat, resultBuilder)
