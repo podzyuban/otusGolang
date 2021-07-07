@@ -9,7 +9,9 @@ import (
 
 var (
 	ErrInvalidString = errors.New("invalid string")
-	escapeSymbol     = `\`
+
+	ErrInvalidParseDigit = errors.New("invalid parse digit")
+	escapeSymbol         = `\`
 )
 
 func Unpack(value string) (string, error) {
@@ -30,10 +32,15 @@ func Unpack(value string) (string, error) {
 				repeatSymbol = currentSymbol
 			} else {
 				repeat, errorResult := strconv.Atoi(currentSymbol)
+
+				if errorResult == nil {
+					_, errorResult = tryAppend(repeatSymbol, repeat, &resultBuilder)
+				}
+
 				if errorResult != nil {
 					break
 				}
-				tryAppend(repeatSymbol, repeat, &resultBuilder)
+
 				repeatSymbol = ""
 			}
 			continue
@@ -61,7 +68,7 @@ func Unpack(value string) (string, error) {
 
 func tryAppend(value string, count int, resultBuilder *strings.Builder) (bool, error) {
 	if count < 0 {
-		return false, ErrInvalidString
+		return false, ErrInvalidParseDigit
 	}
 	if count == 0 {
 		return false, nil
