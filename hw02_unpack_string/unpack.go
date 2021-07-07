@@ -23,40 +23,15 @@ func Unpack(value string) (string, error) {
 		currentSymbol := string(valueItem)
 
 		if unicode.IsDigit(valueItem) {
-			if len(repeatSymbol) == 0 {
-				errorResult = ErrInvalidString
-				break
-			}
-
-			if repeatSymbol == escapeSymbol {
-				repeatSymbol = currentSymbol
-			} else {
-				repeat, errorResult := strconv.Atoi(currentSymbol)
-
-				if errorResult == nil {
-					_, errorResult = tryAppend(repeatSymbol, repeat, &resultBuilder)
-				}
-
-				if errorResult != nil {
-					break
-				}
-
-				repeatSymbol = ""
-			}
-			continue
-		}
-
-		if len(repeatSymbol) == 0 {
-			repeatSymbol = currentSymbol
-			continue
-		}
-
-		if repeatSymbol == escapeSymbol {
-			repeatSymbol += currentSymbol
+			repeatSymbol, errorResult = processDigit(currentSymbol, repeatSymbol, &resultBuilder)
 		} else {
-			tryAppend(repeatSymbol, 1, &resultBuilder)
-			repeatSymbol = currentSymbol
+			repeatSymbol, errorResult = processSymbol(currentSymbol, repeatSymbol, &resultBuilder)
 		}
+
+		if errorResult != nil {
+			break
+		}
+		continue
 	}
 
 	if errorResult == nil && len(repeatSymbol) != 0 {
@@ -66,18 +41,54 @@ func Unpack(value string) (string, error) {
 	return resultBuilder.String(), errorResult
 }
 
-func tryAppend(value string, count int, resultBuilder *strings.Builder) (bool, error) {
+func processSymbol(currentSymbol string, repeatSymbol string, resultBuilder *strings.Builder) (string, error) {
+	if len(repeatSymbol) == 0 {
+		return currentSymbol, nil
+	}
+
+	if repeatSymbol == escapeSymbol {
+		repeatSymbol += currentSymbol
+	} else {
+		tryAppend(repeatSymbol, 1, resultBuilder)
+		repeatSymbol = currentSymbol
+	}
+	return repeatSymbol, nil
+}
+
+func processDigit(currentSymbol string, repeatSymbol string, resultBuilder *strings.Builder) (string, error) {
+	var errorResult error
+
+	if len(repeatSymbol) == 0 {
+		return "", ErrInvalidString
+	}
+
+	if repeatSymbol == escapeSymbol {
+		repeatSymbol = currentSymbol
+	} else {
+		repeat, errorResult := strconv.Atoi(currentSymbol)
+
+		if errorResult == nil {
+			errorResult = tryAppend(repeatSymbol, repeat, resultBuilder)
+		}
+
+		repeatSymbol = ""
+	}
+
+	return repeatSymbol, errorResult
+}
+
+func tryAppend(value string, count int, resultBuilder *strings.Builder) error {
 	if count < 0 {
-		return false, ErrInvalidParseDigit
+		return ErrInvalidParseDigit
 	}
 	if count == 0 {
-		return false, nil
+		return nil
 	}
 	escapedValue := processEscaped(value)
 	appendedValue := strings.Repeat(escapedValue, count)
 	resultBuilder.WriteString(appendedValue)
 
-	return true, nil
+	return nil
 }
 
 func processEscaped(value string) string {
