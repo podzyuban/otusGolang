@@ -42,6 +42,7 @@ func Unpack(value string) (string, error) {
 }
 
 func processSymbol(currentSymbol string, repeatSymbol string, resultBuilder *strings.Builder) (string, error) {
+	var errorResult error
 	if len(repeatSymbol) == 0 {
 		return currentSymbol, nil
 	}
@@ -49,10 +50,10 @@ func processSymbol(currentSymbol string, repeatSymbol string, resultBuilder *str
 	if repeatSymbol == escapeSymbol {
 		repeatSymbol += currentSymbol
 	} else {
-		tryAppend(repeatSymbol, 1, resultBuilder)
+		errorResult = tryAppend(repeatSymbol, 1, resultBuilder)
 		repeatSymbol = currentSymbol
 	}
-	return repeatSymbol, nil
+	return repeatSymbol, errorResult
 }
 
 func processDigit(currentSymbol string, repeatSymbol string, resultBuilder *strings.Builder) (string, error) {
