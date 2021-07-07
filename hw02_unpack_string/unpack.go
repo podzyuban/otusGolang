@@ -7,7 +7,10 @@ import (
 	"unicode"
 )
 
-var ErrInvalidString = errors.New("invalid string")
+var (
+	ErrInvalidString = errors.New("invalid string")
+	escapeSymbol     = `\`
+)
 
 func Unpack(value string) (string, error) {
 	var errorResult error = nil
@@ -23,10 +26,13 @@ func Unpack(value string) (string, error) {
 				break
 			}
 
-			if repeatSymbol == `\` {
+			if repeatSymbol == escapeSymbol {
 				repeatSymbol = currentSymbol
 			} else {
-				repeat, _ := strconv.Atoi(currentSymbol)
+				repeat, errorResult := strconv.Atoi(currentSymbol)
+				if errorResult != nil {
+					break
+				}
 				tryAppend(repeatSymbol, repeat, &resultBuilder)
 				repeatSymbol = ""
 			}
@@ -38,7 +44,7 @@ func Unpack(value string) (string, error) {
 			continue
 		}
 
-		if repeatSymbol == `\` {
+		if repeatSymbol == escapeSymbol {
 			repeatSymbol += currentSymbol
 		} else {
 			tryAppend(repeatSymbol, 1, &resultBuilder)
@@ -53,13 +59,18 @@ func Unpack(value string) (string, error) {
 	return resultBuilder.String(), errorResult
 }
 
-func tryAppend(value string, count int, resultBuilder *strings.Builder) {
+func tryAppend(value string, count int, resultBuilder *strings.Builder) (bool, error) {
+	if count < 0 {
+		return false, ErrInvalidString
+	}
 	if count == 0 {
-		return
+		return false, nil
 	}
 	escapedValue := processEscaped(value)
 	appendedValue := strings.Repeat(escapedValue, count)
 	resultBuilder.WriteString(appendedValue)
+
+	return true, nil
 }
 
 func processEscaped(value string) string {
@@ -68,7 +79,7 @@ func processEscaped(value string) string {
 	}
 
 	for _, item := range value {
-		if string(item) != `\` {
+		if string(item) != escapeSymbol {
 			return value
 		}
 	}
