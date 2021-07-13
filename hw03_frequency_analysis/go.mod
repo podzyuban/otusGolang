@@ -1,4 +1,5 @@
-module github.com/podzyuban/otusXXXX/hw03_frequency_analysis
+
+module github.com/podzyuban/otusGolang/hw03_frequency_analysis
 
 go 1.16
 
