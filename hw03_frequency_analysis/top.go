@@ -115,7 +115,7 @@ type frequance struct {
 }
 
 func (f *frequance) increaseCount() {
-	f.count = f.count + 1
+	f.count++
 }
 
 func newFreaquance(word string) *frequance {
